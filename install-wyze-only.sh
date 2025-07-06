@@ -246,8 +246,9 @@ interactive_menu() {
                 read -p "Presiona Enter para continuar..."
                 ;;
             0)
-                echo -e "${RED}🚪 Saliendo...${NC}"
-                exit 0
+                echo -e "${RED}🚪 Saliendo del menú...${NC}"
+                echo -e "${CYAN}💡 Usa 'wyze menu' para volver al panel de control${NC}"
+                break
                 ;;
             *)
                 echo -e "${RED}❌ Opción inválida. Intenta de nuevo.${NC}"
@@ -341,11 +342,13 @@ cat >> /root/.bashrc << 'BASHRC_EOF'
 
 # Mostrar información de Wyze Bridge al hacer login
 if [[ $- == *i* ]]; then
-    echo "🚀 Wyze Bridge Container - Comandos disponibles:"
-    echo "  wyze start|stop|restart|status|logs|config|update|info"
-    echo "  wyze menu - Panel de control interactivo completo"
-    echo "🌐 Acceso Web: http://$(hostname -I | awk '{print $1}'):5000"
-    echo
+    # Verificar si estamos en un login interactivo (no en script)
+    if [[ -z "$BASH_EXECUTION_STRING" ]] && [[ "${BASH_SOURCE[0]}" == "${0}" || "${BASH_SOURCE[0]}" == "-bash" ]]; then
+        # Esperar un momento para que termine de cargar el terminal
+        sleep 1
+        # Ejecutar el menú interactivo automáticamente
+        wyze menu
+    fi
 fi
 BASHRC_EOF
 
