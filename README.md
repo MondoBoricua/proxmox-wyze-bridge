@@ -18,9 +18,9 @@ Este script automatiza completamente la instalación de **Wyze Bridge** en conte
 - ✅ **Panel de Control**: Interfaz completa de gestión
 - ✅ **Configuración Automática**: Servicios systemd listos para usar
 
-## 🚀 Instalación Ultra-Rápida
+## 🚀 Instalación
 
-### Opción 1: Instalación Directa (Recomendada)
+### Opción 1: Instalación Completa (Recomendada)
 
 ```bash
 # Ejecutar desde Proxmox VE (como root)
@@ -34,6 +34,13 @@ bash <(curl -s https://raw.githubusercontent.com/MondoBoricua/proxmox-wyze-bridg
 wget https://raw.githubusercontent.com/MondoBoricua/proxmox-wyze-bridge/main/auto-install.sh
 chmod +x auto-install.sh
 ./auto-install.sh
+```
+
+### Opción 3: Solo Instalar Wyze Bridge (en contenedor existente)
+
+```bash
+# Ejecutar DENTRO del contenedor LXC
+bash <(curl -s https://raw.githubusercontent.com/MondoBoricua/proxmox-wyze-bridge/main/install-wyze-only.sh)
 ```
 
 ## 🎮 Características Principales
@@ -100,8 +107,11 @@ rtsp://[IP_CONTENEDOR]:8554/[nombre_camara]
 
 ### **Comandos Principales**
 ```bash
-# Panel de control completo
+# Panel de control completo (instalación completa)
 wyze-bridge-menu
+
+# Comando simple de gestión (instalación solo Wyze)
+wyze start|stop|restart|status|logs|config|update|info
 
 # Actualizar Wyze Bridge
 python3 /root/wyze-bridge.py update
