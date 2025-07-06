@@ -278,5 +278,4 @@ Este proyecto está bajo la Licencia MIT. Ver `LICENSE` para más detalles.
 
 ---
 
-**Desarrollado con ❤️ por MondoBoricua** 🇵🇷  
-*Para la comunidad de Proxmox y usuarios de Wyze* 
+**Desarrollado en 🇵🇷 Puerto Rico con mucho ☕ café para la comunidad de Proxmox y usuarios de Wyze**
