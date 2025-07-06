@@ -1,0 +1,83 @@
+# Archivos de configuración sensibles
+*.env
+app.env
+config.json
+credentials.json
+
+# Logs
+*.log
+logs/
+*.log.*
+
+# Archivos temporales
+*.tmp
+*.temp
+.tmp/
+temp/
+
+# Archivos de backup
+*.backup
+*.bak
+backups/
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Archivos de editor
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# Archivos de Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Archivos de prueba
+test_*
+*_test.py
+tests/
+
+# Archivos de documentación generados
+docs/_build/
+site/
+
+# Archivos de instalación
+install.json
+installation_*
+
+# Archivos de estado
+.state
+*.state
+status.json 
