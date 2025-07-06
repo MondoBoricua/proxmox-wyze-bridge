@@ -585,6 +585,9 @@ cat > /etc/motd << 'MOTD_EOF'
 
 MOTD_EOF
 
+# Configurar PATH para incluir /usr/local/bin
+echo 'export PATH="/usr/local/bin:$PATH"' >> /root/.bashrc
+
 # Configurar .bashrc para mostrar menú automáticamente
 cat >> /root/.bashrc << 'BASHRC_EOF'
 

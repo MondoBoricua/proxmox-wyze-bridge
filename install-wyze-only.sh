@@ -160,7 +160,11 @@ EOF
 
 chmod +x /usr/local/bin/wyze
 
-# Configurar MOTD
+# Configurar PATH para incluir /usr/local/bin
+msg "🔧 Configurando PATH..."
+echo 'export PATH="/usr/local/bin:$PATH"' >> /root/.bashrc
+
+# Configurar MOTD y .bashrc
 msg "📄 Configurando mensaje de bienvenida..."
 cat > /etc/motd << 'EOF'
 ╔══════════════════════════════════════════════════════════════════╗
@@ -175,6 +179,18 @@ cat > /etc/motd << 'EOF'
 ╚══════════════════════════════════════════════════════════════════╝
 
 EOF
+
+# Agregar información útil al .bashrc
+cat >> /root/.bashrc << 'BASHRC_EOF'
+
+# Mostrar información de Wyze Bridge al hacer login
+if [[ $- == *i* ]]; then
+    echo "🚀 Wyze Bridge Container - Comandos disponibles:"
+    echo "  wyze start|stop|restart|status|logs|config|update|info"
+    echo "🌐 Acceso Web: http://$(hostname -I | awk '{print $1}'):5000"
+    echo
+fi
+BASHRC_EOF
 
 # Información final
 success "🎉 Instalación completada!"
