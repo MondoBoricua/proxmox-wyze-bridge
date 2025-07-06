@@ -17,6 +17,7 @@ NC='\033[0m' # Sin color
 # Variables globales
 SELECTED_VMID=""
 INSTALLATION_TYPE=""
+CONTAINER_NAME=""
 
 # Función para mostrar mensajes con timestamp
 show_message() {
@@ -155,11 +156,44 @@ get_user_vmid() {
 
 # Función para obtener el próximo VMID disponible
 get_next_available_vmid() {
-    local vmid=111
-    while pct status $vmid &>/dev/null; do
+    local vmid=109
+    while pct status $vmid &>/dev/null 2>&1; do
         ((vmid++))
+        # Evitar números muy altos
+        if [[ $vmid -gt 999 ]]; then
+            echo "999"
+            return 1
+        fi
     done
     echo $vmid
+}
+
+# Función para configurar nombre del contenedor
+get_container_name() {
+    echo
+    echo -e "${CYAN}📝 Configuración del nombre del contenedor:${NC}"
+    echo -e "${YELLOW}Nombre por defecto: wyze-bridge-lxc${NC}"
+    echo -e "${YELLOW}¿Deseas usar un nombre personalizado? (y/N): ${NC}"
+    read -r custom_name
+    
+    if [[ "$custom_name" =~ ^[Yy]$ ]]; then
+        while true; do
+            echo -e "${YELLOW}Ingresa el nombre personalizado (solo letras, números y guiones): ${NC}"
+            read -r user_name
+            
+            # Validar nombre
+            if [[ "$user_name" =~ ^[a-zA-Z0-9-]+$ ]] && [[ ${#user_name} -le 15 ]] && [[ ${#user_name} -ge 3 ]]; then
+                CONTAINER_NAME="$user_name"
+                break
+            else
+                echo -e "${RED}❌ Nombre inválido. Debe tener 3-15 caracteres, solo letras, números y guiones.${NC}"
+            fi
+        done
+    else
+        CONTAINER_NAME="wyze-bridge-lxc"
+    fi
+    
+    echo -e "${GREEN}✅ Nombre del contenedor: $CONTAINER_NAME${NC}"
 }
 
 # Función para crear el contenedor LXC
@@ -177,7 +211,7 @@ create_container() {
     # Crear contenedor con configuración optimizada para Wyze Bridge
     pct create $vmid \
         local:vztmpl/ubuntu-22.04-standard_22.04-1_amd64.tar.zst \
-        --hostname wyze-bridge-lxc \
+        --hostname $CONTAINER_NAME \
         --memory 2048 \
         --swap 512 \
         --cores 2 \
@@ -189,7 +223,8 @@ create_container() {
         --unprivileged 1 \
         --ostype ubuntu \
         --arch amd64 \
-        --description "Wyze Bridge - Instalación Nativa (GiZZoR)"
+        --tags "wyze-bridge,camera,streaming,lxc" \
+        --description "Wyze Bridge LXC - Streaming de cámaras Wyze nativo"
     
     # Iniciar contenedor
     show_message $BLUE "▶️ Iniciando contenedor..."
@@ -266,7 +301,7 @@ show_final_instructions() {
     echo "║                   🎯 CONTENEDOR CREADO EXITOSAMENTE                       ║"
     echo "║                                                                           ║"
     echo "║  VMID: $vmid                                                              ║"
-    echo "║  Hostname: wyze-bridge-lxc                                                ║"
+    echo "║  Hostname: $CONTAINER_NAME                                               ║"
     echo "║  IP: $container_ip                                                        ║"
     echo "║                                                                           ║"
     echo "╚═══════════════════════════════════════════════════════════════════════════╝"
@@ -317,8 +352,16 @@ main() {
     local vmid=$SELECTED_VMID
     local install_type=$INSTALLATION_TYPE
     
+    # Configurar nombre del contenedor si es nuevo
+    if [[ "$install_type" == "new" ]]; then
+        get_container_name
+    fi
+    
     show_message $CYAN "🆔 VMID seleccionado: $vmid"
     show_message $CYAN "📋 Tipo de instalación: $install_type"
+    if [[ "$install_type" == "new" ]]; then
+        show_message $CYAN "📝 Nombre del contenedor: $CONTAINER_NAME"
+    fi
     
     # Solicitar confirmación
     echo
