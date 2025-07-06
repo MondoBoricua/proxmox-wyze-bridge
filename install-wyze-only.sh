@@ -343,16 +343,19 @@ cat > /etc/profile.d/wyze-auto-menu.sh << 'PROFILE_EOF'
 #!/bin/bash
 # Auto-ejecutar menú de Wyze Bridge para usuarios interactivos
 if [[ $- == *i* ]] && [[ -n "$PS1" ]] && [[ "$USER" == "root" ]]; then
-    # Verificar si es un login directo (no un comando específico)
-    if [[ -z "$SSH_ORIGINAL_COMMAND" ]] && [[ "$0" == "-bash" || "$0" == "bash" ]]; then
-        # Evitar bucles infinitos con un flag temporal
-        if [[ ! -f /tmp/.wyze_menu_active ]]; then
-            touch /tmp/.wyze_menu_active
-            # Limpiar el flag cuando termine
-            trap 'rm -f /tmp/.wyze_menu_active' EXIT
-            # Ejecutar el menú después de un breve delay
-            sleep 0.5
-            wyze menu
+    # Verificar si es un login directo (pct enter, consola web, o SSH)
+    if [[ -z "$SSH_ORIGINAL_COMMAND" ]]; then
+        # Detectar diferentes tipos de login
+        if [[ "$0" == "-bash" ]] || [[ "$0" == "bash" ]] || [[ "$TERM" == "xterm"* ]] || [[ "$TERM" == "screen"* ]]; then
+            # Evitar bucles infinitos con un flag temporal
+            if [[ ! -f /tmp/.wyze_menu_active ]]; then
+                touch /tmp/.wyze_menu_active
+                # Limpiar el flag cuando termine
+                trap 'rm -f /tmp/.wyze_menu_active' EXIT
+                # Ejecutar el menú después de un breve delay
+                sleep 0.5
+                wyze menu
+            fi
         fi
     fi
 fi
@@ -363,6 +366,21 @@ chmod +x /etc/profile.d/wyze-auto-menu.sh
 # Agregar información útil al .bashrc
 cat >> /root/.bashrc << 'BASHRC_EOF'
 
+# Función para ejecutar el menú de Wyze Bridge
+wyze_auto_start() {
+    if [[ $- == *i* ]] && [[ -n "$PS1" ]]; then
+        # Verificar si no hay menú activo
+        if [[ ! -f /tmp/.wyze_menu_active ]]; then
+            # Crear flag temporal
+            touch /tmp/.wyze_menu_active
+            # Limpiar el flag cuando termine
+            trap 'rm -f /tmp/.wyze_menu_active' EXIT
+            # Ejecutar el menú
+            wyze menu
+        fi
+    fi
+}
+
 # Función para mostrar información rápida si no se ejecuta el menú
 wyze_info() {
     if [[ $- == *i* ]]; then
@@ -371,11 +389,17 @@ wyze_info() {
     fi
 }
 
-# Backup: Si el menú automático no funciona, mostrar info básica
+# Auto-ejecutar menú en diferentes escenarios
 if [[ $- == *i* ]] && [[ -n "$PS1" ]]; then
-    # Solo mostrar info si no hay menú activo
-    if [[ ! -f /tmp/.wyze_menu_active ]]; then
-        # Delay para ver si el menú se ejecuta
+    # Detectar consola web de Proxmox (TTY) o SSH/pct enter
+    if [[ "$TERM" == "xterm"* ]] || [[ "$TERM" == "screen"* ]] || [[ -t 0 ]]; then
+        # Verificar si no hay menú activo
+        if [[ ! -f /tmp/.wyze_menu_active ]]; then
+            # Ejecutar inmediatamente para consola web
+            wyze_auto_start
+        fi
+    else
+        # Backup: mostrar info básica si no se ejecuta el menú
         (sleep 2 && [[ ! -f /tmp/.wyze_menu_active ]] && wyze_info) &
     fi
 fi
