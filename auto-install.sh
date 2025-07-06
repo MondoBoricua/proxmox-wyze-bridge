@@ -177,7 +177,7 @@ create_container() {
     # Crear contenedor con configuración optimizada para Wyze Bridge
     pct create $vmid \
         local:vztmpl/ubuntu-22.04-standard_22.04-1_amd64.tar.zst \
-        --hostname wyze-bridge-native \
+        --hostname wyze-bridge-lxc \
         --memory 2048 \
         --swap 512 \
         --cores 2 \
@@ -263,10 +263,10 @@ show_final_instructions() {
     
     echo -e "${GREEN}"
     echo "╔═══════════════════════════════════════════════════════════════════════════╗"
-    echo "║                   🎯 CONTENEDOR CREADO EXITOSAMENTE                      ║"
+    echo "║                   🎯 CONTENEDOR CREADO EXITOSAMENTE                       ║"
     echo "║                                                                           ║"
-    echo "║  VMID: $vmid                                                               ║"
-    echo "║  Hostname: wyze-bridge-native                                             ║"
+    echo "║  VMID: $vmid                                                              ║"
+    echo "║  Hostname: wyze-bridge-lxc                                                ║"
     echo "║  IP: $container_ip                                                        ║"
     echo "║                                                                           ║"
     echo "╚═══════════════════════════════════════════════════════════════════════════╝"
