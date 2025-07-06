@@ -72,16 +72,17 @@ msg "📁 Creando directorios..."
 mkdir -p /etc/wyze-bridge
 mkdir -p /var/log/wyze-bridge
 
-msg "📥 Descargando instalador de GiZZoR..."
+msg "📥 Descargando instalador integrado de Wyze Bridge..."
 cd /root
-if ! wget -O wyze-bridge.py https://github.com/GiZZoR/wyze-bridge-installer/raw/refs/heads/main/wyze-bridge.py; then
-    error "No se pudo descargar el instalador de GiZZoR"
+if ! wget -O wyze-bridge.py https://raw.githubusercontent.com/MondoBoricua/proxmox-wyze-bridge/main/wyze-bridge.py; then
+    error "No se pudo descargar el instalador de Wyze Bridge"
 fi
 
 chmod +x wyze-bridge.py
 
-msg "🚀 Instalando Wyze Bridge usando el instalador de GiZZoR..."
+msg "🚀 Instalando Wyze Bridge usando el instalador integrado..."
 msg "💡 Esto puede tomar varios minutos..."
+msg "🔧 Basado en el instalador de GiZZoR pero integrado en nuestro proyecto"
 
 # Ejecutar instalación con manejo de errores mejorado
 msg "⚠️  Si FFmpeg falla, continuaremos sin él (se puede instalar después)"

@@ -5,7 +5,7 @@
 
 ## 📋 Descripción
 
-Este proyecto automatiza la instalación de **Wyze Bridge** en contenedores LXC de Proxmox VE utilizando el instalador nativo de [GiZZoR](https://github.com/GiZZoR/wyze-bridge-installer). 
+Este proyecto automatiza la instalación de **Wyze Bridge** en contenedores LXC de Proxmox VE utilizando un instalador nativo integrado basado en el excelente trabajo de [GiZZoR](https://github.com/GiZZoR/wyze-bridge-installer). 
 
 **Características principales:**
 - ✅ **Instalación nativa** (sin Docker)
@@ -81,7 +81,7 @@ export PATH=/usr/local/bin:$PATH
 - **Opción:** Instalación automática o manual
 
 ### 📱 install-wyze-only.sh
-- **Wyze Bridge** (versión nativa de GiZZoR)
+- **Wyze Bridge** (instalador nativo integrado)
 - **MediaMTX** (servidor RTSP/WebRTC)
 - **FFmpeg** (procesamiento de video)
 - **Servicios systemd** configurados
@@ -222,7 +222,7 @@ apt update && apt install -y ffmpeg
 
 ### Basado en Proyectos
 - **Wyze Bridge:** [mrlt8/docker-wyze-bridge](https://github.com/mrlt8/docker-wyze-bridge)
-- **Instalador Nativo:** [GiZZoR/wyze-bridge-installer](https://github.com/GiZZoR/wyze-bridge-installer)
+- **Instalador Nativo:** [GiZZoR/wyze-bridge-installer](https://github.com/GiZZoR/wyze-bridge-installer) (integrado)
 - **MediaMTX:** [bluenviron/mediamtx](https://github.com/bluenviron/mediamtx)
 
 ### Archivos de Configuración

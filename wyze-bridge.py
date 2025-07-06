@@ -1,3 +1,8 @@
+#!/usr/bin/env python3
+# Wyze Bridge Installer - Basado en el instalador de GiZZoR
+# Integrado en el proyecto MondoBoricua/proxmox-wyze-bridge
+# Original: https://github.com/GiZZoR/wyze-bridge-installer
+
 import argparse
 import json
 import os
