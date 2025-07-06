@@ -154,16 +154,16 @@ ufw allow 8554/tcp
 ufw allow 8888/tcp
 ufw allow 8889/tcp
 
-# Crear directorios
+# Crear directorios y descargar instalador de GiZZoR
 mkdir -p /opt/wyze-bridge
-cd /opt/wyze-bridge
+cd /root
 
 # Descargar instalador de GiZZoR
-wget -O wyze-bridge-installer.py https://github.com/GiZZoR/wyze-bridge-installer/raw/refs/heads/main/wyze-bridge.py
-chmod +x wyze-bridge-installer.py
+wget -O wyze-bridge.py https://github.com/GiZZoR/wyze-bridge-installer/raw/refs/heads/main/wyze-bridge.py
+chmod +x wyze-bridge.py
 
-# Instalar Wyze Bridge
-python3 wyze-bridge-installer.py install --APP_IP 0.0.0.0 --APP_PORT 5000 --APP_GUNICORN 1
+# Instalar Wyze Bridge usando el instalador de GiZZoR
+python3 wyze-bridge.py install --APP_IP 0.0.0.0 --APP_PORT 5000 --APP_GUNICORN 1
 
 # Crear comando de gestión simple
 cat > /usr/local/bin/wyze << 'WYZE_EOF'
@@ -191,8 +191,8 @@ case "$1" in
         nano /etc/wyze-bridge/app.env
         ;;
     update)
-        cd /opt/wyze-bridge
-        python3 wyze-bridge-installer.py update
+        cd /root
+        python3 wyze-bridge.py update
         ;;
     *)
         echo "Uso: wyze {start|stop|restart|status|logs|config|update}"

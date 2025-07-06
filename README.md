@@ -104,7 +104,7 @@ rtsp://[IP_CONTENEDOR]:8554/[nombre_camara]
 wyze-bridge-menu
 
 # Actualizar Wyze Bridge
-python3 /opt/wyze-bridge/wyze-bridge-installer.py update
+python3 /root/wyze-bridge.py update
 
 # Estado del servicio
 systemctl status wyze-bridge
@@ -113,7 +113,7 @@ systemctl status wyze-bridge
 journalctl -u wyze-bridge -f
 
 # Ver configuración actual
-python3 /opt/wyze-bridge/wyze-bridge-installer.py show-settings
+python3 /root/wyze-bridge.py show-settings
 ```
 
 ### **Gestión de Servicios**
@@ -139,8 +139,7 @@ systemctl enable wyze-bridge mediamtx
 /etc/wyze-bridge/          # Configuración
 ├── app.env                # Variables de entorno
 └── install.json           # Configuración de instalación
-/opt/wyze-bridge/          # Instalador de GiZZoR
-├── wyze-bridge-installer.py
+/root/wyze-bridge.py       # Instalador de GiZZoR
 /var/log/wyze-bridge/      # Logs
 /root/wyze-bridge-info.txt # Información de instalación
 ```
@@ -170,7 +169,7 @@ ENABLE_AUDIO=true
 ### **Opciones del Instalador de GiZZoR**
 ```bash
 # Instalación personalizada
-python3 /opt/wyze-bridge/wyze-bridge-installer.py install \
+python3 /root/wyze-bridge.py install \
     --APP_IP 0.0.0.0 \
     --APP_PORT 5000 \
     --APP_USER wyze \
@@ -188,7 +187,7 @@ python3 /opt/wyze-bridge/wyze-bridge-installer.py install \
 journalctl -u wyze-bridge -f
 
 # Verificar configuración
-python3 /opt/wyze-bridge/wyze-bridge-installer.py show-settings
+python3 /root/wyze-bridge.py show-settings
 
 # Reiniciar servicios
 systemctl restart wyze-bridge mediamtx
@@ -241,8 +240,8 @@ ufw status
 wyze-bridge-menu  # Opción 4
 
 # Método 2: Comando directo
-cd /opt/wyze-bridge
-python3 wyze-bridge-installer.py update
+cd /root
+python3 wyze-bridge.py update
 ```
 
 ### **Actualizar Sistema**

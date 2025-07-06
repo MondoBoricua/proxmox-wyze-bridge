@@ -314,36 +314,36 @@ mkdir -p /var/log/wyze-bridge
 
 # Descargar el instalador nativo de GiZZoR
 show_msg "34" "📥 Descargando instalador nativo de Wyze Bridge..."
-cd /opt/wyze-bridge
+cd /root
 
-# Descargar el script de instalación de GiZZoR
-if ! timeout 60 wget -O wyze-bridge-installer.py https://github.com/GiZZoR/wyze-bridge-installer/raw/refs/heads/main/wyze-bridge.py; then
+# Descargar el script de instalación de GiZZoR directamente
+if ! timeout 60 wget -O wyze-bridge.py https://github.com/GiZZoR/wyze-bridge-installer/raw/refs/heads/main/wyze-bridge.py; then
     show_msg "31" "❌ Error descargando instalador de GiZZoR"
     exit 1
 fi
 
 # Hacer ejecutable el instalador
-chmod +x wyze-bridge-installer.py
+chmod +x wyze-bridge.py
 
-# Instalar Wyze Bridge usando el instalador nativo
+# Instalar Wyze Bridge usando el instalador nativo de GiZZoR
 show_msg "33" "🚀 Instalando Wyze Bridge nativo (esto puede tomar varios minutos)..."
-show_msg "36" "💡 Este instalador instala:"
+show_msg "36" "💡 Este instalador de GiZZoR instala:"
 show_msg "36" "   • docker-wyze-bridge (sin Docker)"
 show_msg "36" "   • MediaMTX para streaming RTSP"
 show_msg "36" "   • FFmpeg para procesamiento de video"
-show_msg "36" "   • Configuración completa de servicios"
+show_msg "36" "   • Configuración completa de servicios systemd"
 
-# Ejecutar instalación con configuración personalizada
-if timeout 1200 python3 wyze-bridge-installer.py install \
+# Ejecutar instalación con configuración personalizada usando el script de GiZZoR
+if timeout 1200 python3 wyze-bridge.py install \
     --APP_IP 0.0.0.0 \
     --APP_PORT 5000 \
     --APP_USER wyze \
     --APP_GUNICORN 1; then
-    show_msg "32" "✅ Wyze Bridge instalado exitosamente"
+    show_msg "32" "✅ Wyze Bridge instalado exitosamente usando GiZZoR installer"
 else
     show_msg "31" "⚠️  Instalación tardó más de lo esperado o falló"
     show_msg "33" "📝 Puedes completar la instalación manualmente con:"
-    show_msg "36" "   cd /opt/wyze-bridge && python3 wyze-bridge-installer.py install"
+    show_msg "36" "   cd /root && python3 wyze-bridge.py install"
 fi
 
 # Verificar instalación
@@ -461,19 +461,19 @@ main_menu() {
                 echo -e "${YELLOW}💡 Reinicia los servicios para aplicar cambios${NC}"
                 read -p "Presiona Enter para continuar..."
                 ;;
-            4)
-                echo -e "${BLUE}⬆️ Actualizando Wyze Bridge...${NC}"
-                cd /opt/wyze-bridge
-                python3 wyze-bridge-installer.py update
-                echo -e "${GREEN}✅ Actualización completada${NC}"
-                sleep 3
-                ;;
-            5)
-                echo -e "${BLUE}⚙️ Configuración actual:${NC}"
-                echo
-                python3 /opt/wyze-bridge/wyze-bridge-installer.py show-settings
-                read -p "Presiona Enter para continuar..."
-                ;;
+                         4)
+                 echo -e "${BLUE}⬆️ Actualizando Wyze Bridge...${NC}"
+                 cd /root
+                 python3 wyze-bridge.py update
+                 echo -e "${GREEN}✅ Actualización completada${NC}"
+                 sleep 3
+                 ;;
+             5)
+                 echo -e "${BLUE}⚙️ Configuración actual:${NC}"
+                 echo
+                 python3 /root/wyze-bridge.py show-settings
+                 read -p "Presiona Enter para continuar..."
+                 ;;
             6)
                 echo -e "${BLUE}🛠️ Gestión de servicios:${NC}"
                 echo -e "  ${WHITE}1.${NC} Iniciar servicios"
@@ -633,7 +633,7 @@ UBICACIONES IMPORTANTES:
 - MediaMTX: /srv/mediamtx
 - Configuración: /etc/wyze-bridge/app.env
 - Logs: journalctl -u wyze-bridge
-- Instalador: /opt/wyze-bridge/wyze-bridge-installer.py
+- Instalador GiZZoR: /root/wyze-bridge.py
 
 SERVICIOS:
 - wyze-bridge: Aplicación principal
@@ -649,7 +649,8 @@ COMANDOS ÚTILES:
 - wyze-bridge-menu: Panel de control
 - systemctl status wyze-bridge: Estado del servicio
 - journalctl -u wyze-bridge -f: Ver logs en tiempo real
-- python3 /opt/wyze-bridge/wyze-bridge-installer.py update: Actualizar
+- python3 /root/wyze-bridge.py update: Actualizar usando GiZZoR
+- python3 /root/wyze-bridge.py show-settings: Ver configuración
 
 CONFIGURACIÓN:
 Edita /etc/wyze-bridge/app.env para configurar:
