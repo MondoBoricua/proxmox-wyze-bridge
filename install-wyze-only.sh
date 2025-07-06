@@ -328,8 +328,8 @@ cat > /etc/motd << 'EOF'
 ║                🚀 WYZE BRIDGE LXC CONTAINER                     ║
 ║                      Listo para usar! 🇵🇷                        ║
 ║                                                                  ║
-║  Comandos: wyze start|stop|restart|status|logs|config|update     ║
-║  Info: wyze info                                                 ║
+║  El menú se abrirá automáticamente...                          ║
+║  Si no aparece, usa: wyze menu                                  ║
 ║                                                                  ║
 ║  Web: http://[IP]:5000                                          ║
 ║  RTSP: rtsp://[IP]:8554/[camera_name]                           ║
@@ -337,17 +337,46 @@ cat > /etc/motd << 'EOF'
 
 EOF
 
+# Crear script de inicio automático más confiable
+msg "🔧 Configurando inicio automático del menú..."
+cat > /etc/profile.d/wyze-auto-menu.sh << 'PROFILE_EOF'
+#!/bin/bash
+# Auto-ejecutar menú de Wyze Bridge para usuarios interactivos
+if [[ $- == *i* ]] && [[ -n "$PS1" ]] && [[ "$USER" == "root" ]]; then
+    # Verificar si es un login directo (no un comando específico)
+    if [[ -z "$SSH_ORIGINAL_COMMAND" ]] && [[ "$0" == "-bash" || "$0" == "bash" ]]; then
+        # Evitar bucles infinitos con un flag temporal
+        if [[ ! -f /tmp/.wyze_menu_active ]]; then
+            touch /tmp/.wyze_menu_active
+            # Limpiar el flag cuando termine
+            trap 'rm -f /tmp/.wyze_menu_active' EXIT
+            # Ejecutar el menú después de un breve delay
+            sleep 0.5
+            wyze menu
+        fi
+    fi
+fi
+PROFILE_EOF
+
+chmod +x /etc/profile.d/wyze-auto-menu.sh
+
 # Agregar información útil al .bashrc
 cat >> /root/.bashrc << 'BASHRC_EOF'
 
-# Mostrar información de Wyze Bridge al hacer login
-if [[ $- == *i* ]]; then
-    # Verificar si estamos en un login interactivo (no en script)
-    if [[ -z "$BASH_EXECUTION_STRING" ]] && [[ "${BASH_SOURCE[0]}" == "${0}" || "${BASH_SOURCE[0]}" == "-bash" ]]; then
-        # Esperar un momento para que termine de cargar el terminal
-        sleep 1
-        # Ejecutar el menú interactivo automáticamente
-        wyze menu
+# Función para mostrar información rápida si no se ejecuta el menú
+wyze_info() {
+    if [[ $- == *i* ]]; then
+        echo "🚀 Wyze Bridge Container - Usa 'wyze menu' para el panel completo"
+        echo "🌐 Web: http://$(hostname -I | awk '{print $1}'):5000"
+    fi
+}
+
+# Backup: Si el menú automático no funciona, mostrar info básica
+if [[ $- == *i* ]] && [[ -n "$PS1" ]]; then
+    # Solo mostrar info si no hay menú activo
+    if [[ ! -f /tmp/.wyze_menu_active ]]; then
+        # Delay para ver si el menú se ejecuta
+        (sleep 2 && [[ ! -f /tmp/.wyze_menu_active ]] && wyze_info) &
     fi
 fi
 BASHRC_EOF
