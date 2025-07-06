@@ -3,6 +3,26 @@
 **Instalación nativa de Wyze Bridge en contenedores LXC de Proxmox VE**  
 *Versión mejorada sin Docker - Usando el instalador de GiZZoR* 🇵🇷
 
+## ⚡ Instalación Rápida (Recomendada - 100% Funcional)
+
+```bash
+# Ejecutar desde Proxmox VE (como root)
+bash <(curl -s https://raw.githubusercontent.com/MondoBoricua/proxmox-wyze-bridge/main/auto-install.sh)
+
+# Reemplaza 109 con tu VMID
+pct enter 109
+
+# Instalar Wyze Bridge
+bash <(curl -s https://raw.githubusercontent.com/MondoBoricua/proxmox-wyze-bridge/main/install-wyze-only.sh)
+
+# Configurar PATH
+export PATH=/usr/local/bin:$PATH
+```
+
+**¡Listo!** Tu Wyze Bridge estará funcionando en minutos. 🎯
+
+---
+
 ## 📋 Descripción
 
 Este proyecto automatiza la instalación de **Wyze Bridge** en contenedores LXC de Proxmox VE utilizando un instalador nativo integrado basado en el excelente trabajo de [GiZZoR](https://github.com/GiZZoR/wyze-bridge-installer). 
@@ -31,7 +51,7 @@ bash <(curl -s https://raw.githubusercontent.com/MondoBoricua/proxmox-wyze-bridg
 pct enter 111
 ```
 
-**Paso 3 - Instalar curl:**
+**Paso 3 - Instalar curl (Opcional):**
 ```bash
 apt update && apt install -y curl
 ```
