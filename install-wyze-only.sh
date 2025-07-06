@@ -137,8 +137,10 @@ show_banner() {
     # Estado de servicios
     if systemctl is-active --quiet wyze-bridge; then
         echo -e "${CYAN}🚀 Wyze Bridge:${NC} ${GREEN}●ACTIVO${NC}"
+        echo -e "${CYAN}📡 MediaMTX:${NC} ${GREEN}●INTEGRADO${NC}"
     else
         echo -e "${CYAN}🚀 Wyze Bridge:${NC} ${RED}●INACTIVO${NC}"
+        echo -e "${CYAN}📡 MediaMTX:${NC} ${RED}●INACTIVO${NC}"
     fi
     
     echo
@@ -154,7 +156,7 @@ show_banner() {
     echo -e "${YELLOW}6.${NC} ${GREEN}⚙️${NC} Configurar Credenciales"
     echo -e "${YELLOW}7.${NC} ${BLUE}🔄${NC} Actualizar Sistema"
     echo -e "${YELLOW}8.${NC} ${CYAN}ℹ️${NC} Información de Acceso"
-    echo -e "${YELLOW}9.${NC} ${YELLOW}📦${NC} Instalar FFmpeg"
+    echo -e "${YELLOW}9.${NC} ${YELLOW}📦${NC} Instalar FFmpeg Optimizado"
     echo -e "${YELLOW}0.${NC} ${RED}🚪${NC} Salir"
     echo
     echo -e "${CYAN}╔══════════════════════════════════════════════════════════════════╗${NC}"
@@ -177,7 +179,7 @@ show_simple_info() {
     echo -e "  ${GREEN}wyze config${NC}        - Configurar credenciales"
     echo -e "  ${BLUE}wyze update${NC}        - Actualizar"
     echo -e "  ${CYAN}wyze info${NC}          - Mostrar información de acceso"
-    echo -e "  ${YELLOW}wyze install-ffmpeg${NC} - Instalar FFmpeg manualmente"
+    echo -e "  ${YELLOW}wyze install-ffmpeg${NC} - Instalar FFmpeg optimizado para cámaras"
     echo -e "  ${MAGENTA}wyze menu${NC}          - Mostrar menú interactivo"
     echo
     echo -e "${GREEN}🌐 Acceso Web:${NC} http://$IP:5000"
@@ -194,25 +196,25 @@ interactive_menu() {
         case $choice in
             1)
                 echo -e "${GREEN}🚀 Iniciando servicios...${NC}"
-                systemctl start wyze-bridge mediamtx
+                systemctl start wyze-bridge
                 echo -e "${GREEN}✅ Servicios iniciados${NC}"
                 read -p "Presiona Enter para continuar..."
                 ;;
             2)
                 echo -e "${RED}⏹️ Parando servicios...${NC}"
-                systemctl stop wyze-bridge mediamtx
+                systemctl stop wyze-bridge
                 echo -e "${RED}⏹️ Servicios detenidos${NC}"
                 read -p "Presiona Enter para continuar..."
                 ;;
             3)
                 echo -e "${BLUE}🔄 Reiniciando servicios...${NC}"
-                systemctl restart wyze-bridge mediamtx
+                systemctl restart wyze-bridge
                 echo -e "${BLUE}🔄 Servicios reiniciados${NC}"
                 read -p "Presiona Enter para continuar..."
                 ;;
             4)
                 echo -e "${CYAN}📊 Estado de servicios:${NC}"
-                systemctl status wyze-bridge mediamtx
+                systemctl status wyze-bridge
                 read -p "Presiona Enter para continuar..."
                 ;;
             5)
@@ -240,9 +242,49 @@ interactive_menu() {
                 read -p "Presiona Enter para continuar..."
                 ;;
             9)
-                echo -e "${YELLOW}📦 Instalando FFmpeg...${NC}"
-                apt update && apt install -y ffmpeg
-                echo -e "${GREEN}✅ FFmpeg instalado desde repositorios del sistema${NC}"
+                echo -e "${YELLOW}📦 Instalando FFmpeg optimizado para cámaras...${NC}"
+                
+                # Detectar arquitectura
+                ARCH=$(uname -m)
+                case $ARCH in
+                    x86_64)
+                        FFMPEG_URL="https://github.com/homebridge/ffmpeg-for-homebridge/releases/latest/download/ffmpeg-alpine-x86_64.tar.gz"
+                        ;;
+                    aarch64)
+                        FFMPEG_URL="https://github.com/homebridge/ffmpeg-for-homebridge/releases/latest/download/ffmpeg-alpine-aarch64.tar.gz"
+                        ;;
+                    armv7l)
+                        FFMPEG_URL="https://github.com/homebridge/ffmpeg-for-homebridge/releases/latest/download/ffmpeg-alpine-arm32v7.tar.gz"
+                        ;;
+                    *)
+                        echo -e "${RED}❌ Arquitectura no soportada: $ARCH${NC}"
+                        echo -e "${YELLOW}📦 Instalando FFmpeg desde repositorios del sistema...${NC}"
+                        apt update && apt install -y ffmpeg
+                        echo -e "${GREEN}✅ FFmpeg instalado desde repositorios del sistema${NC}"
+                        read -p "Presiona Enter para continuar..."
+                        return
+                        ;;
+                esac
+                
+                echo -e "${CYAN}🔧 Descargando FFmpeg optimizado para $ARCH...${NC}"
+                curl -Lf# "$FFMPEG_URL" | tar xzf - -C / --no-same-owner
+                
+                if [ $? -eq 0 ]; then
+                    echo -e "${GREEN}✅ FFmpeg optimizado instalado correctamente${NC}"
+                    echo -e "${CYAN}📍 Ubicación: /usr/local/bin/ffmpeg${NC}"
+                    
+                    # Verificar instalación
+                    if /usr/local/bin/ffmpeg -version >/dev/null 2>&1; then
+                        echo -e "${GREEN}✅ FFmpeg verificado y funcionando${NC}"
+                    else
+                        echo -e "${RED}❌ Error verificando FFmpeg${NC}"
+                    fi
+                else
+                    echo -e "${RED}❌ Error descargando FFmpeg optimizado${NC}"
+                    echo -e "${YELLOW}📦 Instalando FFmpeg desde repositorios del sistema...${NC}"
+                    apt update && apt install -y ffmpeg
+                    echo -e "${GREEN}✅ FFmpeg instalado desde repositorios del sistema${NC}"
+                fi
                 read -p "Presiona Enter para continuar..."
                 ;;
             0)
@@ -261,19 +303,19 @@ interactive_menu() {
 # Lógica principal del comando
 case "$1" in
     start)
-        systemctl start wyze-bridge mediamtx
+        systemctl start wyze-bridge
         echo -e "${GREEN}✅ Servicios iniciados${NC}"
         ;;
     stop)
-        systemctl stop wyze-bridge mediamtx
+        systemctl stop wyze-bridge
         echo -e "${RED}⏹️ Servicios detenidos${NC}"
         ;;
     restart)
-        systemctl restart wyze-bridge mediamtx
+        systemctl restart wyze-bridge
         echo -e "${BLUE}🔄 Servicios reiniciados${NC}"
         ;;
     status)
-        systemctl status wyze-bridge mediamtx
+        systemctl status wyze-bridge
         ;;
     logs)
         journalctl -u wyze-bridge -f
@@ -293,9 +335,48 @@ case "$1" in
         echo -e "${GREEN}🔧 Configuración:${NC} /etc/wyze-bridge/app.env"
         ;;
     install-ffmpeg)
-        echo -e "${YELLOW}📦 Instalando FFmpeg...${NC}"
-        apt update && apt install -y ffmpeg
-        echo -e "${GREEN}✅ FFmpeg instalado desde repositorios del sistema${NC}"
+        echo -e "${YELLOW}📦 Instalando FFmpeg optimizado para cámaras...${NC}"
+        
+        # Detectar arquitectura
+        ARCH=$(uname -m)
+        case $ARCH in
+            x86_64)
+                FFMPEG_URL="https://github.com/homebridge/ffmpeg-for-homebridge/releases/latest/download/ffmpeg-alpine-x86_64.tar.gz"
+                ;;
+            aarch64)
+                FFMPEG_URL="https://github.com/homebridge/ffmpeg-for-homebridge/releases/latest/download/ffmpeg-alpine-aarch64.tar.gz"
+                ;;
+            armv7l)
+                FFMPEG_URL="https://github.com/homebridge/ffmpeg-for-homebridge/releases/latest/download/ffmpeg-alpine-arm32v7.tar.gz"
+                ;;
+            *)
+                echo -e "${RED}❌ Arquitectura no soportada: $ARCH${NC}"
+                echo -e "${YELLOW}📦 Instalando FFmpeg desde repositorios del sistema...${NC}"
+                apt update && apt install -y ffmpeg
+                echo -e "${GREEN}✅ FFmpeg instalado desde repositorios del sistema${NC}"
+                return
+                ;;
+        esac
+        
+        echo -e "${CYAN}🔧 Descargando FFmpeg optimizado para $ARCH...${NC}"
+        curl -Lf# "$FFMPEG_URL" | tar xzf - -C / --no-same-owner
+        
+        if [ $? -eq 0 ]; then
+            echo -e "${GREEN}✅ FFmpeg optimizado instalado correctamente${NC}"
+            echo -e "${CYAN}📍 Ubicación: /usr/local/bin/ffmpeg${NC}"
+            
+            # Verificar instalación
+            if /usr/local/bin/ffmpeg -version >/dev/null 2>&1; then
+                echo -e "${GREEN}✅ FFmpeg verificado y funcionando${NC}"
+            else
+                echo -e "${RED}❌ Error verificando FFmpeg${NC}"
+            fi
+        else
+            echo -e "${RED}❌ Error descargando FFmpeg optimizado${NC}"
+            echo -e "${YELLOW}📦 Instalando FFmpeg desde repositorios del sistema...${NC}"
+            apt update && apt install -y ffmpeg
+            echo -e "${GREEN}✅ FFmpeg instalado desde repositorios del sistema${NC}"
+        fi
         ;;
     menu)
         interactive_menu
@@ -419,6 +500,10 @@ echo "3. Ver información: wyze info"
 echo
 echo -e "${GREEN}🌐 Acceso Web: http://$(hostname -I | awk '{print $1}'):5000${NC}"
 echo -e "${GREEN}📺 RTSP: rtsp://$(hostname -I | awk '{print $1}'):8554/[camera_name]${NC}"
+echo
+echo -e "${CYAN}ℹ️ Nota importante:${NC}"
+echo -e "${YELLOW}📡 MediaMTX está integrado en Wyze Bridge - no es un servicio separado${NC}"
+echo -e "${YELLOW}🔧 Todo se gestiona con el servicio wyze-bridge únicamente${NC}"
 echo
 echo -e "${YELLOW}💡 Usa 'wyze' para gestionar el servicio${NC}"
 echo -e "${YELLOW}💡 Si 'wyze' no funciona, ejecuta: source /root/.bashrc${NC}" 
