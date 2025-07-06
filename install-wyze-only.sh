@@ -162,7 +162,16 @@ chmod +x /usr/local/bin/wyze
 
 # Configurar PATH para incluir /usr/local/bin
 msg "🔧 Configurando PATH..."
-echo 'export PATH="/usr/local/bin:$PATH"' >> /root/.bashrc
+# Asegurar que /usr/local/bin esté en PATH sin duplicar
+if ! grep -q "/usr/local/bin" /root/.bashrc; then
+    echo 'export PATH="/usr/local/bin:$PATH"' >> /root/.bashrc
+    msg "✅ PATH configurado en .bashrc"
+else
+    msg "✅ PATH ya está configurado"
+fi
+
+# También configurar PATH para la sesión actual
+export PATH="/usr/local/bin:$PATH"
 
 # Configurar MOTD y .bashrc
 msg "📄 Configurando mensaje de bienvenida..."
@@ -192,6 +201,10 @@ if [[ $- == *i* ]]; then
 fi
 BASHRC_EOF
 
+# Recargar PATH para que funcione inmediatamente
+msg "🔄 Recargando configuración de PATH..."
+source /root/.bashrc
+
 # Información final
 success "🎉 Instalación completada!"
 echo
@@ -203,4 +216,5 @@ echo
 echo -e "${GREEN}🌐 Acceso Web: http://$(hostname -I | awk '{print $1}'):5000${NC}"
 echo -e "${GREEN}📺 RTSP: rtsp://$(hostname -I | awk '{print $1}'):8554/[camera_name]${NC}"
 echo
-echo -e "${YELLOW}💡 Usa 'wyze' para gestionar el servicio${NC}" 
+echo -e "${YELLOW}💡 Usa 'wyze' para gestionar el servicio${NC}"
+echo -e "${YELLOW}💡 Si 'wyze' no funciona, ejecuta: source /root/.bashrc${NC}" 
