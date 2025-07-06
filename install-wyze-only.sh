@@ -56,7 +56,7 @@ msg "🔄 Actualizando sistema..."
 apt update
 
 msg "📦 Instalando dependencias esenciales..."
-apt install -y curl wget python3 python3-pip python3-venv python3-dev build-essential
+apt install -y curl wget ffmpeg python3 python3-pip python3-venv python3-dev build-essential
 
 msg "🛡️ Configurando firewall..."
 ufw --force enable

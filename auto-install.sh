@@ -273,9 +273,9 @@ install_with_retry "curl wget git nano htop ufw"
 show_msg "34" "🐍 Instalando Python y dependencias..."
 install_with_retry "python3 python3-pip python3-venv python3-dev"
 
-# Instalar dependencias de compilación necesarias para algunos paquetes Python
-show_msg "34" "🔨 Instalando herramientas de compilación..."
-install_with_retry "build-essential pkg-config libssl-dev libffi-dev"
+# Instalar dependencias de compilación y FFmpeg
+show_msg "34" "🔨 Instalando herramientas de compilación y FFmpeg..."
+install_with_retry "build-essential pkg-config libssl-dev libffi-dev ffmpeg"
 
 # Verificar versión de Python (necesita 3.10+)
 python_version=$(python3 --version | cut -d' ' -f2 | cut -d'.' -f1,2)
