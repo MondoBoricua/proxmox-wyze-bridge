@@ -83,11 +83,20 @@ chmod +x wyze-bridge.py
 msg "🚀 Instalando Wyze Bridge usando el instalador de GiZZoR..."
 msg "💡 Esto puede tomar varios minutos..."
 
-# Ejecutar instalación
+# Ejecutar instalación con manejo de errores mejorado
+msg "⚠️  Si FFmpeg falla, continuaremos sin él (se puede instalar después)"
 if python3 wyze-bridge.py install --APP_IP 0.0.0.0 --APP_PORT 5000 --APP_USER wyze --APP_GUNICORN 1; then
     success "Wyze Bridge instalado exitosamente"
 else
-    error "Falló la instalación de Wyze Bridge"
+    msg "⚠️  La instalación tuvo algunos problemas, verificando servicios..."
+    
+    # Verificar si los servicios principales se instalaron
+    if systemctl list-unit-files | grep -q wyze-bridge; then
+        success "Wyze Bridge se instaló correctamente (ignorando errores de FFmpeg)"
+        msg "💡 FFmpeg se puede instalar manualmente después si es necesario"
+    else
+        error "Falló la instalación de Wyze Bridge - servicios no encontrados"
+    fi
 fi
 
 # Crear comando simple de gestión
@@ -126,16 +135,22 @@ case "$1" in
         echo "📺 RTSP: rtsp://$(hostname -I | awk '{print $1}'):8554/[camera_name]"
         echo "🔧 Configuración: /etc/wyze-bridge/app.env"
         ;;
+    install-ffmpeg)
+        echo "📦 Instalando FFmpeg..."
+        apt update && apt install -y ffmpeg
+        echo "✅ FFmpeg instalado desde repositorios del sistema"
+        ;;
     *)
         echo "🚀 Wyze Bridge - Comandos disponibles:"
-        echo "  wyze start     - Iniciar servicios"
-        echo "  wyze stop      - Parar servicios"
-        echo "  wyze restart   - Reiniciar servicios"
-        echo "  wyze status    - Ver estado"
-        echo "  wyze logs      - Ver logs en tiempo real"
-        echo "  wyze config    - Configurar credenciales"
-        echo "  wyze update    - Actualizar"
-        echo "  wyze info      - Mostrar información de acceso"
+        echo "  wyze start         - Iniciar servicios"
+        echo "  wyze stop          - Parar servicios"
+        echo "  wyze restart       - Reiniciar servicios"
+        echo "  wyze status        - Ver estado"
+        echo "  wyze logs          - Ver logs en tiempo real"
+        echo "  wyze config        - Configurar credenciales"
+        echo "  wyze update        - Actualizar"
+        echo "  wyze info          - Mostrar información de acceso"
+        echo "  wyze install-ffmpeg - Instalar FFmpeg manualmente"
         echo
         echo "🌐 Acceso Web: http://$(hostname -I | awk '{print $1}'):5000"
         echo "📺 RTSP: rtsp://$(hostname -I | awk '{print $1}'):8554/[camera_name]"

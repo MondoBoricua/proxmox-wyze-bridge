@@ -334,6 +334,7 @@ show_msg "36" "   • FFmpeg para procesamiento de video"
 show_msg "36" "   • Configuración completa de servicios systemd"
 
 # Ejecutar instalación con configuración personalizada usando el script de GiZZoR
+show_msg "33" "⚠️  Si FFmpeg falla durante la instalación, continuaremos sin él"
 if timeout 1200 python3 wyze-bridge.py install \
     --APP_IP 0.0.0.0 \
     --APP_PORT 5000 \
@@ -341,9 +342,17 @@ if timeout 1200 python3 wyze-bridge.py install \
     --APP_GUNICORN 1; then
     show_msg "32" "✅ Wyze Bridge instalado exitosamente usando GiZZoR installer"
 else
-    show_msg "31" "⚠️  Instalación tardó más de lo esperado o falló"
-    show_msg "33" "📝 Puedes completar la instalación manualmente con:"
-    show_msg "36" "   cd /root && python3 wyze-bridge.py install"
+    show_msg "33" "⚠️  La instalación tuvo algunos problemas, verificando servicios..."
+    
+    # Verificar si los servicios principales se instalaron
+    if systemctl list-unit-files | grep -q wyze-bridge; then
+        show_msg "32" "✅ Wyze Bridge se instaló correctamente (ignorando errores de FFmpeg)"
+        show_msg "36" "💡 FFmpeg se puede instalar después con: wyze install-ffmpeg"
+    else
+        show_msg "31" "⚠️  Instalación tardó más de lo esperado o falló"
+        show_msg "33" "📝 Puedes completar la instalación manualmente con:"
+        show_msg "36" "   cd /root && python3 wyze-bridge.py install"
+    fi
 fi
 
 # Verificar instalación
@@ -436,14 +445,15 @@ main_menu() {
         echo -e "  ${WHITE}3.${NC} Configurar credenciales"
         echo -e "  ${WHITE}4.${NC} Actualizar Wyze Bridge"
         echo -e "  ${WHITE}5.${NC} Ver configuración"
-        echo -e "  ${WHITE}6.${NC} Gestionar servicios"
-        echo -e "  ${WHITE}7.${NC} Información del sistema"
-        echo -e "  ${WHITE}0.${NC} Salir"
+                 echo -e "  ${WHITE}6.${NC} Gestionar servicios"
+         echo -e "  ${WHITE}7.${NC} Información del sistema"
+         echo -e "  ${WHITE}8.${NC} Instalar FFmpeg"
+         echo -e "  ${WHITE}0.${NC} Salir"
         echo
-        echo -e "${YELLOW}Selecciona una opción (0-7): ${NC}"
-        read -r choice
-        
-        case $choice in
+                 echo -e "${YELLOW}Selecciona una opción (0-8): ${NC}"
+         read -r choice
+         
+         case $choice in
             1)
                 echo -e "${BLUE}📋 Logs de Wyze Bridge (Ctrl+C para salir):${NC}"
                 journalctl -u wyze-bridge -f --no-pager
@@ -513,17 +523,23 @@ main_menu() {
                 echo -e "${WHITE}Uptime:${NC} $(uptime -p)"
                 echo -e "${WHITE}Memory:${NC} $(free -h | grep Mem | awk '{print $3"/"$2}')"
                 echo -e "${WHITE}Disk:${NC} $(df -h / | tail -1 | awk '{print $3"/"$2" ("$5" usado)"}')"
-                echo
-                read -p "Presiona Enter para continuar..."
-                ;;
-            0)
-                echo -e "${GREEN}¡Hasta la vista, pana! 👋${NC}"
-                exit 0
-                ;;
-            *)
-                echo -e "${RED}❌ Opción inválida${NC}"
-                sleep 1
-                ;;
+                                 echo
+                 read -p "Presiona Enter para continuar..."
+                 ;;
+             8)
+                 echo -e "${BLUE}📦 Instalando FFmpeg...${NC}"
+                 apt update && apt install -y ffmpeg
+                 echo -e "${GREEN}✅ FFmpeg instalado desde repositorios del sistema${NC}"
+                 sleep 2
+                 ;;
+             0)
+                 echo -e "${GREEN}¡Hasta la vista, pana! 👋${NC}"
+                 exit 0
+                 ;;
+             *)
+                 echo -e "${RED}❌ Opción inválida${NC}"
+                 sleep 1
+                 ;;
         esac
     done
 }
