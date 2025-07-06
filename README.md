@@ -17,7 +17,7 @@ Este proyecto automatiza la instalación de **Wyze Bridge** en contenedores LXC 
 
 ## 🛠️ Opciones de Instalación
 
-### 🎯 Opción 1: Instalación Completa (Recomendada)
+### 🎯 Instalación Completa (Proceso Manual)
 
 **Paso 1 - Crear contenedor:**
 ```bash
@@ -25,21 +25,50 @@ Este proyecto automatiza la instalación de **Wyze Bridge** en contenedores LXC 
 bash <(curl -s https://raw.githubusercontent.com/MondoBoricua/proxmox-wyze-bridge/main/auto-install.sh)
 ```
 
-**Paso 2 - Instalar Wyze Bridge:**
+**Paso 2 - Entrar al contenedor:**
 ```bash
-# Entrar al contenedor (reemplaza 111 con tu VMID)
+# Reemplaza 111 con tu VMID
 pct enter 111
+```
 
-# Instalar Wyze Bridge
+**Paso 3 - Instalar curl:**
+```bash
+apt update && apt install -y curl
+```
+
+**Paso 4 - Instalar Wyze Bridge:**
+```bash
 bash <(curl -s https://raw.githubusercontent.com/MondoBoricua/proxmox-wyze-bridge/main/install-wyze-only.sh)
 ```
 
-### 🔧 Opción 2: Solo Wyze Bridge (Contenedor Existente)
-
-Si ya tienes un contenedor LXC:
+**Paso 5 - Configurar PATH (si es necesario):**
 ```bash
-# Dentro del contenedor
+export PATH=/usr/local/bin:$PATH
+```
+
+**Paso 6 - Gestionar servicios:**
+```bash
+/usr/local/bin/wyze start
+/usr/local/bin/wyze status
+/usr/local/bin/wyze config
+```
+
+### 🔧 Solo Wyze Bridge (Contenedor Existente)
+
+Si ya tienes un contenedor LXC, sigue estos pasos dentro del contenedor:
+
+```bash
+# 1. Instalar curl
+apt update && apt install -y curl
+
+# 2. Instalar Wyze Bridge
 bash <(curl -s https://raw.githubusercontent.com/MondoBoricua/proxmox-wyze-bridge/main/install-wyze-only.sh)
+
+# 3. Configurar PATH (si es necesario)
+export PATH=/usr/local/bin:$PATH
+
+# 4. Gestionar servicios
+/usr/local/bin/wyze start
 ```
 
 ## 📦 ¿Qué se Instala?
@@ -86,17 +115,18 @@ wyze-bridge-menu
 
 ### 🔧 Comando Simple
 ```bash
-# Dentro del contenedor
-wyze
+# Dentro del contenedor (usa ruta completa si PATH no funciona)
+/usr/local/bin/wyze
 ```
 
 **Comandos disponibles:**
-- `wyze start` - Iniciar servicio
-- `wyze stop` - Detener servicio
-- `wyze restart` - Reiniciar servicio
-- `wyze status` - Ver estado
-- `wyze logs` - Ver logs
-- `wyze install-ffmpeg` - Instalar FFmpeg
+- `/usr/local/bin/wyze start` - Iniciar servicio
+- `/usr/local/bin/wyze stop` - Detener servicio
+- `/usr/local/bin/wyze restart` - Reiniciar servicio
+- `/usr/local/bin/wyze status` - Ver estado
+- `/usr/local/bin/wyze logs` - Ver logs
+- `/usr/local/bin/wyze config` - Configurar credenciales
+- `/usr/local/bin/wyze install-ffmpeg` - Instalar FFmpeg
 
 ## 📝 Configuración Inicial
 
@@ -108,8 +138,8 @@ pct enter [VMID]
 
 ### 2. Configurar Credenciales
 ```bash
-# Opción A: Panel completo
-wyze-bridge-menu
+# Opción A: Comando simple (usa ruta completa si PATH no funciona)
+/usr/local/bin/wyze config
 
 # Opción B: Editar directamente
 nano /etc/wyze-bridge/app.env
@@ -158,8 +188,8 @@ journalctl -u mediamtx -f
 
 ### Verificar Estado
 ```bash
-# Estado de todos los servicios
-wyze-bridge-menu
+# Estado con comando simple
+/usr/local/bin/wyze status
 
 # Estado específico
 systemctl status wyze-bridge
@@ -169,10 +199,10 @@ systemctl status mediamtx
 ### Reinstalar FFmpeg
 ```bash
 # Si FFmpeg falló durante la instalación
-wyze install-ffmpeg
+/usr/local/bin/wyze install-ffmpeg
 
-# O desde el panel
-wyze-bridge-menu  # Opción 6
+# O manualmente
+apt update && apt install -y ffmpeg
 ```
 
 ## 🔧 Requisitos del Sistema

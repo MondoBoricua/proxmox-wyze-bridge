@@ -272,25 +272,36 @@ show_final_instructions() {
     echo "╚═══════════════════════════════════════════════════════════════════════════╝"
     echo -e "${NC}"
     
-    echo -e "${CYAN}📝 PRÓXIMOS PASOS:${NC}"
+    echo -e "${CYAN}📝 PRÓXIMOS PASOS - INSTALACIÓN MANUAL:${NC}"
     echo
-    echo -e "${WHITE}🔧 OPCIÓN 1 - Instalación Manual (Recomendada):${NC}"
-    echo -e "${YELLOW}   1. Entrar al contenedor:${NC}"
+    echo -e "${WHITE}🔧 PASO 1 - Entrar al contenedor:${NC}"
     echo -e "${BLUE}      pct enter $vmid${NC}"
     echo
-    echo -e "${YELLOW}   2. Instalar Wyze Bridge:${NC}"
+    echo -e "${WHITE}🔧 PASO 2 - Instalar curl:${NC}"
+    echo -e "${BLUE}      apt update && apt install -y curl${NC}"
+    echo
+    echo -e "${WHITE}🔧 PASO 3 - Instalar Wyze Bridge:${NC}"
     echo -e "${BLUE}      bash <(curl -s https://raw.githubusercontent.com/MondoBoricua/proxmox-wyze-bridge/main/install-wyze-only.sh)${NC}"
     echo
-    echo -e "${WHITE}🚀 OPCIÓN 2 - Instalación Automática:${NC}"
-    echo -e "${YELLOW}   Ejecutar desde Proxmox:${NC}"
-    echo -e "${BLUE}      pct exec $vmid -- bash -c \"curl -s https://raw.githubusercontent.com/MondoBoricua/proxmox-wyze-bridge/main/install-wyze-only.sh | bash\"${NC}"
+    echo -e "${WHITE}🔧 PASO 4 - Configurar PATH (si es necesario):${NC}"
+    echo -e "${BLUE}      export PATH=/usr/local/bin:\$PATH${NC}"
+    echo
+    echo -e "${WHITE}🔧 PASO 5 - Gestionar servicios:${NC}"
+    echo -e "${BLUE}      /usr/local/bin/wyze start${NC}"
+    echo -e "${BLUE}      /usr/local/bin/wyze status${NC}"
+    echo -e "${BLUE}      /usr/local/bin/wyze config${NC}"
+    echo
+    echo -e "${CYAN}📋 COMANDOS ÚTILES DENTRO DEL CONTENEDOR:${NC}"
+    echo -e "${WHITE}• /usr/local/bin/wyze start|stop|restart|status|logs|config|info${NC}"
+    echo -e "${WHITE}• systemctl start|stop|restart wyze-bridge${NC}"
+    echo -e "${WHITE}• journalctl -u wyze-bridge -f${NC}"
+    echo -e "${WHITE}• nano /etc/wyze-bridge/app.env${NC}"
     echo
     echo -e "${CYAN}📋 DESPUÉS DE LA INSTALACIÓN:${NC}"
     echo -e "${WHITE}• Interfaz web: http://$container_ip:5000${NC}"
-    echo -e "${WHITE}• Panel de control: wyze-bridge-menu (dentro del contenedor)${NC}"
-    echo -e "${WHITE}• Comando simple: wyze (dentro del contenedor)${NC}"
+    echo -e "${WHITE}• RTSP: rtsp://$container_ip:8554/[camera_name]${NC}"
     echo
-    echo -e "${GREEN}✅ El contenedor está listo para instalar Wyze Bridge${NC}"
+    echo -e "${GREEN}✅ El contenedor está listo - Sigue los pasos de arriba${NC}"
 }
 
 # Función principal
@@ -341,15 +352,9 @@ main() {
         configure_container $vmid
     fi
     
-    # Preguntar si quiere instalación automática
+    # Mostrar mensaje informativo
     echo
-    echo -e "${YELLOW}¿Deseas instalar Wyze Bridge automáticamente ahora? (y/N): ${NC}"
-    echo -e "${CYAN}💡 Si eliges 'No', recibirás instrucciones para hacerlo manualmente${NC}"
-    read -r auto_install
-    
-    if [[ "$auto_install" =~ ^[Yy]$ ]]; then
-        auto_install_wyze $vmid
-    fi
+    echo -e "${CYAN}💡 El contenedor está listo. Sigue las instrucciones de abajo para instalar Wyze Bridge${NC}"
     
     # Mostrar instrucciones finales
     show_final_instructions $vmid
